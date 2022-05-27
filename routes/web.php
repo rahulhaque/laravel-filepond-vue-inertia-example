@@ -51,10 +51,10 @@ Route::middleware([
             ],
         ]);
 
-        // Move the file to permanent storage
+        // Move the file to permanent storage (./storage/app/public/avatars)
         $fileInfo = Filepond::field($request->avatar)->moveTo('avatars/avatar-'.auth()->id());
 
-        // Save locatopn in the user table
+        // Save location in the user table
         auth()->user()->update([
             'name' => $request->name,
             'email' => $request->email,

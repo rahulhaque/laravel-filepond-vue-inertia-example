@@ -1,10 +1,11 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { useForm, usePage } from '@inertiajs/inertia-vue3';
+import { useForm } from '@inertiajs/inertia-vue3';
 import { ref } from "vue";
 
 const props = defineProps({
     user: Object,
+    csrf_token: String
 });
 
 const form = useForm({
@@ -115,7 +116,7 @@ export default {
                 server: {
                     url: '/filepond',
                     headers: {
-                        'X-CSRF-TOKEN': document.head.querySelector("[name=csrf-token][content]").content,
+                        'X-CSRF-TOKEN': this.props.csrf_token,
                     }
                 }
             });

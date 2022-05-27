@@ -2,6 +2,7 @@
 
 Demo project to show how to use Rahul Haque's [Laravel Filepond](https://github.com/rahulhaque/laravel-filepond) package in Laravel Jetstream Vue Inertia project. Jump to the implementation directly by opening below files or install locally to tinker with various options. 
 - [./resources/js/Pages/Dashboard.vue](resources/js/Pages/Dashboard.vue) - frontend logic.
+- [./app/Http/Middleware/HandleInertiaRequests.php](app/Http/Middleware/HandleInertiaRequests.php) - csrf token share.
 - [./routes/web.php](routes/web.php) - backend logic.
 
 ## Requirements
