@@ -49,10 +49,19 @@ Route::middleware([
                     'image:jpeg,png'
                 ])
             ],
+            'gallery' => 'required',
+            'gallery.*' => [
+                'required',
+                Rule::filepond([
+                    'max:1024',
+                    'image:jpeg,png'
+                ])
+            ],
         ]);
 
         // Move the file to permanent storage (./storage/app/public/avatars)
         $fileInfo = Filepond::field($request->avatar)->moveTo('avatars/avatar-'.auth()->id());
+        $galleryInfo = Filepond::field($request->gallery)->moveTo('galleries/gallery-'.auth()->id());
 
         // Save location in the user table
         auth()->user()->update([

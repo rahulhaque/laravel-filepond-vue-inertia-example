@@ -23482,6 +23482,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/Layouts/AppLayout.vue */ "./resources/js/Layouts/AppLayout.vue");
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 // Import filepond
  // Import filepond plugins
 
@@ -23507,13 +23513,26 @@ var __default__ = {
         }
       });
     },
-    handleFilePondProcess: function handleFilePondProcess(error, file) {
+    handleFilePondAvatarProcess: function handleFilePondAvatarProcess(error, file) {
       // Set the server id from response
       this.form.avatar = file.serverId;
     },
-    handleFilePondRemoveFile: function handleFilePondRemoveFile(error, file) {
+    handleFilePondAvatarRemoveFile: function handleFilePondAvatarRemoveFile(error, file) {
       // Remove the server id on file remove
       this.form.avatar = null;
+    },
+    handleFilePondGalleryProcess: function handleFilePondGalleryProcess(error, file) {
+      // Set the server id from response
+      this.form.gallery.push({
+        id: file.id,
+        serverId: file.serverId
+      });
+    },
+    handleFilePondGalleryRemoveFile: function handleFilePondGalleryRemoveFile(error, file) {
+      // Remove the server id on file remove
+      this.form.gallery = this.form.gallery.filter(function (item) {
+        return item.id !== file.id;
+      });
     }
   }
 };
@@ -23532,14 +23551,25 @@ var __default__ = {
     var form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_6__.useForm)({
       name: props.user.name,
       email: props.user.email,
-      avatar: null
+      avatar: null,
+      gallery: []
     });
     var filepondAvatarInput = (0,vue__WEBPACK_IMPORTED_MODULE_7__.ref)(null); // Reference the input to clear the files later
 
+    var filepondGalleryInput = (0,vue__WEBPACK_IMPORTED_MODULE_7__.ref)(null); // Reference the input to clear the files later
+
     var submit = function submit() {
-      form.put(route('update-user-info'), {
+      form.transform(function (data) {
+        return _objectSpread(_objectSpread({}, data), {}, {
+          gallery: data.gallery.map(function (item) {
+            return item.serverId;
+          }) // Pluck only the serverIds
+
+        });
+      }).put(route('update-user-info'), {
         onSuccess: function onSuccess() {
           filepondAvatarInput.value.removeFiles();
+          filepondGalleryInput.value.removeFiles();
         }
       });
     };
@@ -23549,6 +23579,7 @@ var __default__ = {
       props: props,
       form: form,
       filepondAvatarInput: filepondAvatarInput,
+      filepondGalleryInput: filepondGalleryInput,
       submit: submit,
       vueFilePond: (vue_filepond__WEBPACK_IMPORTED_MODULE_0___default()),
       setOptions: vue_filepond__WEBPACK_IMPORTED_MODULE_0__.setOptions,
@@ -27292,10 +27323,22 @@ var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_13 = {
-  key: 0,
+  "class": "mt-4"
+};
+
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "block font-medium text-sm text-gray-700"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Gallery")], -1
+/* HOISTED */
+);
+
+var _hoisted_15 = {
+  key: 0
+};
+var _hoisted_16 = {
   "class": "text-red-500"
 };
-var _hoisted_14 = ["disabled"];
+var _hoisted_17 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppLayout"], {
     title: "Dashboard"
@@ -27335,19 +27378,34 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "allow-multiple": "false",
         "accepted-file-types": "image/*",
         onInit: $options.handleFilePondInit,
-        onProcessfile: $options.handleFilePondProcess,
-        onRemovefile: $options.handleFilePondRemoveFile
+        onProcessfile: $options.handleFilePondAvatarProcess,
+        onRemovefile: $options.handleFilePondAvatarRemoveFile
       }, null, 8
       /* PROPS */
-      , ["onInit", "onProcessfile", "onRemovefile"]), $setup.form.errors.avatar ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.form.errors.avatar), 1
-      /* TEXT */
-      )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      , ["onInit", "onProcessfile", "onRemovefile"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["FilePond"], {
+        name: "gallery",
+        ref: "filepondGalleryInput",
+        "class-name": "my-pond",
+        "allow-multiple": "true",
+        "accepted-file-types": "image/*",
+        onInit: $options.handleFilePondInit,
+        onProcessfile: $options.handleFilePondGalleryProcess,
+        onRemovefile: $options.handleFilePondGalleryRemoveFile
+      }, null, 8
+      /* PROPS */
+      , ["onInit", "onProcessfile", "onRemovefile"]), $setup.form.errors ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.form.errors, function (error, index) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(error), 1
+        /* TEXT */
+        );
+      }), 256
+      /* UNKEYED_FRAGMENT */
+      ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "submit",
         "class": "inline-flex items-center justify-center mt-3 p-3 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition w-full",
         disabled: $setup.form.processing
       }, " Submit ", 8
       /* PROPS */
-      , _hoisted_14)], 40
+      , _hoisted_17)], 40
       /* PROPS, HYDRATE_EVENTS */
       , _hoisted_5)])])])];
     }),

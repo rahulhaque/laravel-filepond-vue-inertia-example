@@ -12,16 +12,26 @@ const form = useForm({
     name: props.user.name,
     email: props.user.email,
     avatar: null,
+    gallery: [],
 });
 
 const filepondAvatarInput = ref(null); // Reference the input to clear the files later
+const filepondGalleryInput = ref(null); // Reference the input to clear the files later
 
 const submit = () => {
-    form.put(route('update-user-info'), {
-        onSuccess: () => {
-            filepondAvatarInput.value.removeFiles();
-        },
-    });
+    form
+        .transform((data) => {
+            return {
+                ...data,
+                gallery: data.gallery.map(item => item.serverId) // Pluck only the serverIds
+            }
+        })
+        .put(route('update-user-info'), {
+            onSuccess: () => {
+                filepondAvatarInput.value.removeFiles();
+                filepondGalleryInput.value.removeFiles();
+            },
+        });
 };
 </script>
 
@@ -72,10 +82,27 @@ const submit = () => {
                                 allow-multiple="false"
                                 accepted-file-types="image/*"
                                 @init="handleFilePondInit"
-                                @processfile="handleFilePondProcess"
-                                @removefile="handleFilePondRemoveFile"
+                                @processfile="handleFilePondAvatarProcess"
+                                @removefile="handleFilePondAvatarRemoveFile"
                             />
-                            <div v-if="form.errors.avatar" class="text-red-500">{{ form.errors.avatar }}</div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block font-medium text-sm text-gray-700">
+                                <span>Gallery</span>
+                            </label>
+                            <FilePond
+                                name="gallery"
+                                ref="filepondGalleryInput"
+                                class-name="my-pond"
+                                allow-multiple="true"
+                                accepted-file-types="image/*"
+                                @init="handleFilePondInit"
+                                @processfile="handleFilePondGalleryProcess"
+                                @removefile="handleFilePondGalleryRemoveFile"
+                            />
+                            <div v-if="form.errors">
+                                <div v-for="(error, index) in form.errors" class="text-red-500">{{ error }}</div>
+                            </div>
                         </div>
                         <button
                             type="submit"
@@ -121,13 +148,21 @@ export default {
                 }
             });
         },
-        handleFilePondProcess: function (error, file) {
+        handleFilePondAvatarProcess: function (error, file) {
             // Set the server id from response
             this.form.avatar = file.serverId;
         },
-        handleFilePondRemoveFile: function (error, file) {
+        handleFilePondAvatarRemoveFile: function (error, file) {
             // Remove the server id on file remove
             this.form.avatar = null;
+        },
+        handleFilePondGalleryProcess: function (error, file) {
+            // Set the server id from response
+            this.form.gallery.push({id: file.id, serverId: file.serverId});
+        },
+        handleFilePondGalleryRemoveFile: function (error, file) {
+            // Remove the server id on file remove
+            this.form.gallery = this.form.gallery.filter(item => item.id !== file.id);
         },
     },
 };
