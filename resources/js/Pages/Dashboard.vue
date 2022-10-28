@@ -1,40 +1,3 @@
-<script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { useForm } from '@inertiajs/inertia-vue3';
-import { ref } from "vue";
-
-const props = defineProps({
-    user: Object,
-    csrf_token: String
-});
-
-const form = useForm({
-    name: props.user.name,
-    email: props.user.email,
-    avatar: null,
-    gallery: [],
-});
-
-const filepondAvatarInput = ref(null); // Reference the input to clear the files later
-const filepondGalleryInput = ref(null); // Reference the input to clear the files later
-
-const submit = () => {
-    form
-        .transform((data) => {
-            return {
-                ...data,
-                gallery: data.gallery.map(item => item.serverId) // Pluck only the serverIds
-            }
-        })
-        .put(route('update-user-info'), {
-            onSuccess: () => {
-                filepondAvatarInput.value.removeFiles();
-                filepondGalleryInput.value.removeFiles();
-            },
-        });
-};
-</script>
-
 <template>
     <AppLayout title="Dashboard">
         <template #header>
@@ -118,7 +81,11 @@ const submit = () => {
     </AppLayout>
 </template>
 
-<script>
+<script setup>
+import AppLayout from "../Layouts/AppLayout";
+import { useForm } from "@inertiajs/inertia-vue3";
+import { ref } from "vue";
+
 // Import filepond
 import vueFilePond, { setOptions } from 'vue-filepond';
 
@@ -130,40 +97,66 @@ import FilePondPluginImagePreview from 'filepond-plugin-image-preview/dist/filep
 import 'filepond/dist/filepond.min.css';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
 
+const props = defineProps({
+    user: Object,
+    csrf_token: String
+});
+
+const filepondAvatarInput = ref(null); // Reference the input to clear the files later
+const filepondGalleryInput = ref(null); // Reference the input to clear the files later
+
+const form = useForm({
+    name: props.user.name,
+    email: props.user.email,
+    avatar: null,
+    gallery: [],
+});
+
+const submit = () => {
+    form
+        .transform((data) => {
+            return {
+                ...data,
+                gallery: data.gallery.map(item => item.serverId) // Pluck only the serverIds
+            }
+        })
+        .put(route('update-profile'), {
+            onSuccess: () => {
+                filepondAvatarInput.value.removeFiles();
+                filepondGalleryInput.value.removeFiles();
+            },
+        });
+};
+
 // Create FilePond component
 const FilePond = vueFilePond(FilePondPluginFileValidateType, FilePondPluginImagePreview);
 
-export default {
-    name: 'Dashboard',
-    methods: {
-        handleFilePondInit: function () {
-            // Set global options on filepond init
-            setOptions({
-                credits: false,
-                server: {
-                    url: '/filepond',
-                    headers: {
-                        'X-CSRF-TOKEN': this.props.csrf_token,
-                    }
-                }
-            });
-        },
-        handleFilePondAvatarProcess: function (error, file) {
-            // Set the server id from response
-            this.form.avatar = file.serverId;
-        },
-        handleFilePondAvatarRemoveFile: function (error, file) {
-            // Remove the server id on file remove
-            this.form.avatar = null;
-        },
-        handleFilePondGalleryProcess: function (error, file) {
-            // Set the server id from response
-            this.form.gallery.push({id: file.id, serverId: file.serverId});
-        },
-        handleFilePondGalleryRemoveFile: function (error, file) {
-            // Remove the server id on file remove
-            this.form.gallery = this.form.gallery.filter(item => item.id !== file.id);
-        },
-    },
+// Set global options on filepond init
+const handleFilePondInit = () => {
+    setOptions({
+        credits: false,
+        server: {
+            url: '/filepond',
+            headers: {
+                'X-CSRF-TOKEN': props.csrf_token,
+            }
+        }
+    });
 };
+// Set the server id from response
+const handleFilePondAvatarProcess = (error, file) => {
+    form.avatar = file.serverId;
+};
+// Remove the server id on file remove
+const handleFilePondAvatarRemoveFile = (error, file) => {
+    form.avatar = null;
+};
+// Set the server id from response
+const handleFilePondGalleryProcess = (error, file) => {
+    form.gallery.push({id: file.id, serverId: file.serverId});
+};
+// Remove the server id on file remove
+const handleFilePondGalleryRemoveFile = (error, file) => {
+    form.gallery = form.gallery.filter(item => item.id !== file.id);
+}
 </script>

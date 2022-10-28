@@ -18,6 +18,9 @@ mix.js('resources/js/app.js', 'public/js').vue()
     ])
     .alias({
         '@': 'resources/js',
+    })
+    .browserSync({
+        host: '0.0.0.0'
     });
 
 if (mix.inProduction()) {
